@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Französisch Verben Trainer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
+            --bg-grad-start: #0f172a;
+            --bg-grad-end: #1e1b4b;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --error: #ef4444;
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0 0 8px 0;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-pill {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 24px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            margin: 0 0 16px 0;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #e2e8f0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 16px;
+            border: none;
+            font-size: 1rem;
+            font-family: var(--font-main);
+            font-weight: 600;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn.main {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn.main:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn.small {
+            width: auto;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            margin-top: 16px;
+        }
+
+        .btn-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .btn-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .back {
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .back:hover {
+            color: var(--text-main);
+        }
+
+        .back::before {
+            content: "←";
+            margin-right: 6px;
+        }
+
+        .question {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .question strong {
+            color: #c084fc;
+            font-weight: 600;
+            display: block;
+            font-size: 1.4rem;
+            margin-top: 4px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-main);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .option-btn.correct {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: var(--success);
+            color: #86efac;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--error);
+            color: #fca5a5;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            margin-top: 8px;
+            font-family: var(--font-main);
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .feedback {
+            margin-top: 16px;
+            font-size: 1rem;
+            min-height: 1.5em;
+            font-weight: 500;
+            padding: 10px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .feedback.visible {
+            display: block;
+            animation: slideUp 0.2s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.ok {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .feedback.err {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .victory-icon {
+            font-size: 4rem;
+            display: block;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .global-progress {
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .global-progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .global-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Stats List Styles */
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-name {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .stat-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .stat-val {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 12px;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .stat-bar-bg {
+            width: 80px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-left: 12px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+        }
+
+        @media (min-width: 600px) {
+            .menu-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .menu-grid button:last-child {
+                grid-column: span 2;
+            }
+        }
+
+        /* Light Theme */
+        [data-theme="light"] {
+            --bg-grad-start: #e0e7ff;
+            --bg-grad-end: #f3e8ff;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        /* Success Animation */
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .success-animation {
+            animation: successPulse 0.4s ease-out;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 600px) {
+            #app { padding: 16px; }
+            .btn { min-height: 44px; padding: 12px 16px; font-size: clamp(0.9rem, 3vw, 1rem); }
+            .option-btn { min-height: 44px; font-size: clamp(0.9rem, 3vw, 1rem); }
+            h1 { font-size: clamp(1.5rem, 5vw, 2rem); }
+            .question { font-size: clamp(1rem, 3vw, 1.1rem); }
+            .card { padding: 20px; }
+            input[type="text"] { font-size: 16px; /* Prevents zoom on iOS */ }
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 1000;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Keyboard hint */
+        .kb-hint {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        /* Better touch targets */
+        .btn, .option-btn {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1>Französisch Trainer</h1>
+            <div class="subtitle">30 Verben • Vokabeln • Präsens • Passé composé</div>
+            <div class="stats-bar">
+                <div class="stat-pill">Session: <span id="session-val">0</span></div>
+                <div class="stat-pill" id="progress-pill" style="display:none;">Frage <span id="current-q">1</span>/<span id="total-q">10</span></div>
+                
+                <div class="stat-pill">Verbleibend: <span id="remaining-val">-</span></div>
+                <div class="stat-pill" id="streak-pill" style="display:none;">🔥 <span id="streak-val">0</span> Tage</div>
+                
+            </div>
+        </header>
+
+        <!-- START -->
+        <section id="screen-start" class="screen active">
+            <div class="global-progress">
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                    <span>Gesamtfortschritt</span>
+                    <span id="global-percent">0%</span>
+                </div>
+                <div class="global-progress-bar">
+                    <div id="global-fill" class="global-progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Wähle deinen Modus</h2>
+                <div class="menu-grid">
+                    <button class="btn main" data-target="de-fr-mc">
+                        <div class="btn-label"><span>DE → FR (Quiz)</span><span class="prog-txt">0%</span></div>
+                        <div class="btn-progress"></div>
+                    </button>
+                    <button class="btn main" data-target="de-fr-write">
+                        <div class="btn-label"><span>DE → FR (Schreiben)</span><span class="prog-txt">0%</span></div>
+                        <div class="btn-progress"></div>
+                    </button>
+                    <button class="btn main" data-target="fr-de-mc">
+                        <div class="btn-label"><span>FR → DE (Quiz)</span><span class="prog-txt">0%</span></div>
+                        <div class="btn-progress"></div>
+                    </button>
+                    <button class="btn main" data-target="fr-de-write">
+                        <div class="btn-label"><span>FR → DE (Schreiben)</span><span class="prog-txt">0%</span></div>
+                        <div class="btn-progress"></div>
+                    </button>
+                    <button class="btn main" data-target="pc">
+                        <div class="btn-label"><span>Passé composé</span><span class="prog-txt">0%</span></div>
+                        <div class="btn-progress"></div>
+                    </button>
+                    <button class="btn main" data-target="conj-mc">
+                        <div class="btn-label"><span>Konjugation (Quiz)</span><span class="prog-txt">0%</span></div>
+                        <div class="btn-progress"></div>
+                    </button>
+                    <button class="btn main" data-target="conj-write">
+                        <div class="btn-label"><span>Konjugation (Schreiben)</span><span class="prog-txt">0%</span>
+                        </div>
+                        <div class="btn-progress"></div>
+                    </button>
+                </div>
+                <div style="margin-top:16px; display:flex; gap:10px;">
+                    <button class="btn small" onclick="showScreen('stats')"
+                        style="flex:1; background:rgba(255,255,255,0.1);">📊 Statistik</button>
+                    <button class="btn small" onclick="resetAllProgress()"
+                        style="flex:1; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.3);">Reset</button>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 16px;">
+                <h2>Hinweis</h2>
+                <p style="font-size:0.9rem; margin:0; color: var(--text-muted); line-height: 1.6;">
+                    • <strong>Jede Form zählt:</strong> Du musst jede einzelne Verbform meistern.<br>
+                    • Dein Fortschritt wird gespeichert.<br>
+                    • Groß-/Kleinschreibung ist egal, aber <strong>Akzente</strong> müssen stimmen!
+                </p>
+            </div>
+        </section>
+
+        <!-- STATS SCREEN -->
+        <section id="screen-stats" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>Deine Statistik</h2>
+                <div id="stats-list" class="stats-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VICTORY -->
+        <section id="screen-victory" class="screen">
+            <div class="card" style="text-align:center;">
+                <div class="victory-icon">🎉</div>
+                <h2 id="vic-title">Fantastique!</h2>
+                <p id="vic-msg">Du hast diese Lektion gemeistert.</p>
+                <button class="btn main" onclick="showScreen('start')">Zurück zum Start</button>
+            </div>
+        </section>
+
+        <!-- DE → FR MC -->
+        <section id="screen-de-fr-mc" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>DE → FR • Quiz</h2>
+                <div id="dfmc-q" class="question"></div>
+                <div id="dfmc-opt" class="options"></div>
+                <div id="dfmc-fb" class="feedback"></div>
+                <button class="btn small main" id="dfmc-next" style="display:none">Weiter</button>
+            </div>
+        </section>
+
+        <!-- DE → FR Schreiben -->
+        <section id="screen-de-fr-write" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>DE → FR • Schreiben</h2>
+                <div id="dfw-q" class="question"></div>
+                <input id="dfw-in" type="text" autocomplete="off" placeholder="Deine Antwort..." />
+                <div id="dfw-fb" class="feedback"></div>
+                <button class="btn small main" id="dfw-check">Prüfen</button>
+            </div>
+        </section>
+
+        <!-- FR → DE MC -->
+        <section id="screen-fr-de-mc" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>FR → DE • Quiz</h2>
+                <div id="fdmc-q" class="question"></div>
+                <div id="fdmc-opt" class="options"></div>
+                <div id="fdmc-fb" class="feedback"></div>
+                <button class="btn small main" id="fdmc-next" style="display:none">Weiter</button>
+            </div>
+        </section>
+
+        <!-- FR → DE Schreiben -->
+        <section id="screen-fr-de-write" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>FR → DE • Schreiben</h2>
+                <div id="fdw-q" class="question"></div>
+                <input id="fdw-in" type="text" autocomplete="off" placeholder="Deine Antwort..." />
+                <div id="fdw-fb" class="feedback"></div>
+                <button class="btn small main" id="fdw-check">Prüfen</button>
+            </div>
+        </section>
+
+        <!-- Passé composé Schreiben -->
+        <section id="screen-pc" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>Passé composé</h2>
+                <div id="pc-q" class="question"></div>
+                <div class="label">Person + Hilfsverb + Partizip (z.B. <i>je suis allé</i>)</div>
+                <input id="pc-in" type="text" autocomplete="off" placeholder="z.B. j'ai fait" />
+                <div id="pc-fb" class="feedback"></div>
+                <button class="btn small main" id="pc-check">Prüfen</button>
+            </div>
+        </section>
+
+        <!-- Konjugation Präsens MC -->
+        <section id="screen-conj-mc" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>Konjugation • Quiz</h2>
+                <div id="conj-mc-q" class="question"></div>
+                <div id="conj-mc-opt" class="options"></div>
+                <div id="conj-mc-fb" class="feedback"></div>
+                <button class="btn small main" id="conj-mc-next" style="display:none">Weiter</button>
+            </div>
+        </section>
+
+        <!-- Konjugation Präsens Schreiben -->
+        <section id="screen-conj-write" class="screen">
+            <div class="back" data-back>Zurück</div>
+            <div class="card">
+                <h2>Konjugation • Schreiben</h2>
+                <div id="conj-w-q" class="question"></div>
+                <div class="label">Nur Verbform (ohne Pronomen):</div>
+                <input id="conj-w-in" type="text" autocomplete="off" placeholder="Verbform..." />
+                <div id="conj-w-fb" class="feedback"></div>
+                <button class="btn small main" id="conj-w-check">Prüfen</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+
+        // --------- Theme Management ----------
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') || 'dark';
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        }
+
+        // --------- Streak Counter ----------
+        function updateStreakCounter() {
+            const lastDate = localStorage.getItem('lastLearningDate');
+            const today = new Date().toDateString();
+            let streak = parseInt(localStorage.getItem('learningStreak') || '0');
+
+            if (lastDate === today) {
+                // Already learned today
+            } else if (lastDate) {
+                const last = new Date(lastDate);
+                const now = new Date();
+                const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    streak++;
+                } else if (diffDays > 1) {
+                    streak = 1;
+                }
+            } else {
+                streak = 1;
+            }
+
+            localStorage.setItem('learningStreak', streak.toString());
+            localStorage.setItem('lastLearningDate', today);
+
+            const pill = document.getElementById('streak-pill');
+            const val = document.getElementById('streak-val');
+            if (streak > 0) {
+                pill.style.display = 'block';
+                val.textContent = streak;
+            }
+        }
+
+        // --------- Difficult Verbs Tracking ----------
+        function trackDifficultVerb(verbInf) {
+            const key = 'difficultVerbs';
+            let difficult = JSON.parse(localStorage.getItem(key) || '{}');
+            difficult[verbInf] = (difficult[verbInf] || 0) + 1;
+            localStorage.setItem(key, JSON.stringify(difficult));
+        }
+
+        function getDifficultVerbs() {
+            const difficult = JSON.parse(localStorage.getItem('difficultVerbs') || '{}');
+            return Object.entries(difficult)
+                .filter(([_, count]) => count >= 3)
+                .map(([inf, _]) => inf);
+        }
+
+        // --------- Export/Import ----------
+        function exportProgress() {
+            const data = {
+                progress: store.data,
+                streak: localStorage.getItem('learningStreak'),
+                lastDate: localStorage.getItem('lastLearningDate'),
+                difficult: localStorage.getItem('difficultVerbs'),
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `french-trainer-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (confirm('Fortschritt importieren? Dies überschreibt deine aktuellen Daten.')) {
+                            store.data = data.progress;
+                            store.save();
+                            if (data.streak) localStorage.setItem('learningStreak', data.streak);
+                            if (data.lastDate) localStorage.setItem('lastLearningDate', data.lastDate);
+                            if (data.difficult) localStorage.setItem('difficultVerbs', data.difficult);
+                            updateStartScreen();
+                            updateStreakCounter();
+                            alert('Import erfolgreich!');
+                        }
+                    } catch (err) {
+                        alert('Fehler beim Import: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // --------- Keyboard Navigation ----------
+        let currentMCOptions = [];
+
+        function setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                // Number keys for MC
+                if (e.key >= '1' && e.key <= '4' && currentMCOptions.length > 0) {
+                    const idx = parseInt(e.key) - 1;
+                    if (idx < currentMCOptions.length && !currentMCOptions[idx].disabled) {
+                        currentMCOptions[idx].click();
+                    }
+                }
+            });
+        }
+
+        // --------- Enhanced Answer Validation ----------
+        function normalizePasseCompose(answer) {
+            // Normalize spacing: "j' ai" -> "j'ai", "j'  ai" -> "j'ai"
+            return answer.replace(/j'\s+/gi, "j'").trim();
+        }
+
+        function checkAnswerEnhanced(input, correct) {
+            const normalized = normalizePasseCompose(input);
+            const normalizedCorrect = normalizePasseCompose(correct);
+            return normalized.trim().toLowerCase() === normalizedCorrect.trim().toLowerCase();
+        }
+
+        // --------- Enter Key Support ----------
+        function setupEnterKey(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+            if (input && button) {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        button.click();
+                    }
+                });
+            }
+        }
+
+        // --------- Progress Indicator ----------
+        function updateProgressIndicator(current, total) {
+            const pill = document.getElementById('progress-pill');
+            const currentSpan = document.getElementById('current-q');
+            const totalSpan = document.getElementById('total-q');
+            
+            if (total > 0) {
+                pill.style.display = 'block';
+                currentSpan.textContent = current;
+                totalSpan.textContent = total;
+            } else {
+                pill.style.display = 'none';
+            }
+        }
+
+        // --------- Datensatz: 30 Verben ----------
+        const verbs = [
+            { inf: "être", de: "sein", aux: "avoir", pp: "été", pres: { "je": "suis", "tu": "es", "il/elle/on": "est", "nous": "sommes", "vous": "êtes", "ils/elles": "sont" } },
+            { inf: "avoir", de: "haben", aux: "avoir", pp: "eu", pres: { "je": "ai", "tu": "as", "il/elle/on": "a", "nous": "avons", "vous": "avez", "ils/elles": "ont" } },
+            { inf: "faire", de: "machen", aux: "avoir", pp: "fait", pres: { "je": "fais", "tu": "fais", "il/elle/on": "fait", "nous": "faisons", "vous": "faites", "ils/elles": "font" } },
+            { inf: "dire", de: "sagen", aux: "avoir", pp: "dit", pres: { "je": "dis", "tu": "dis", "il/elle/on": "dit", "nous": "disons", "vous": "dites", "ils/elles": "disent" } },
+            { inf: "pouvoir", de: "können", aux: "avoir", pp: "pu", pres: { "je": "peux", "tu": "peux", "il/elle/on": "peut", "nous": "pouvons", "vous": "pouvez", "ils/elles": "peuvent" } },
+            { inf: "aller", de: "gehen", aux: "être", pp: "allé", pres: { "je": "vais", "tu": "vas", "il/elle/on": "va", "nous": "allons", "vous": "allez", "ils/elles": "vont" } },
+            { inf: "vouloir", de: "wollen", aux: "avoir", pp: "voulu", pres: { "je": "veux", "tu": "veux", "il/elle/on": "veut", "nous": "voulons", "vous": "voulez", "ils/elles": "veulent" } },
+            { inf: "voir", de: "sehen", aux: "avoir", pp: "vu", pres: { "je": "vois", "tu": "vois", "il/elle/on": "voit", "nous": "voyons", "vous": "voyez", "ils/elles": "voient" } },
+            { inf: "savoir", de: "wissen", aux: "avoir", pp: "su", pres: { "je": "sais", "tu": "sais", "il/elle/on": "sait", "nous": "savons", "vous": "savez", "ils/elles": "savent" } },
+            { inf: "falloir", de: "müssen (unpers.)", aux: "avoir", pp: "fallu", pres: { "il/elle/on": "faut" } },
+            { inf: "devoir", de: "müssen", aux: "avoir", pp: "dû", pres: { "je": "dois", "tu": "dois", "il/elle/on": "doit", "nous": "devons", "vous": "devez", "ils/elles": "doivent" } },
+            { inf: "croire", de: "glauben", aux: "avoir", pp: "cru", pres: { "je": "crois", "tu": "crois", "il/elle/on": "croit", "nous": "croyons", "vous": "croyez", "ils/elles": "croient" } },
+            { inf: "trouver", de: "finden", aux: "avoir", pp: "trouvé", pres: { "je": "trouve", "tu": "trouves", "il/elle/on": "trouve", "nous": "trouvons", "vous": "trouvez", "ils/elles": "trouvent" } },
+            { inf: "prendre", de: "nehmen", aux: "avoir", pp: "pris", pres: { "je": "prends", "tu": "prends", "il/elle/on": "prend", "nous": "prenons", "vous": "prenez", "ils/elles": "prennent" } },
+            { inf: "mettre", de: "setzen/legen", aux: "avoir", pp: "mis", pres: { "je": "mets", "tu": "mets", "il/elle/on": "met", "nous": "mettons", "vous": "mettez", "ils/elles": "mettent" } },
+            { inf: "tenir", de: "halten", aux: "avoir", pp: "tenu", pres: { "je": "tiens", "tu": "tiens", "il/elle/on": "tient", "nous": "tenons", "vous": "tenez", "ils/elles": "tiennent" } },
+            { inf: "entendre", de: "hören", aux: "avoir", pp: "entendu", pres: { "je": "entends", "tu": "entends", "il/elle/on": "entend", "nous": "entendons", "vous": "entendez", "ils/elles": "entendent" } },
+            { inf: "connaître", de: "kennen", aux: "avoir", pp: "connu", pres: { "je": "connais", "tu": "connais", "il/elle/on": "connaît", "nous": "connaissons", "vous": "connaissez", "ils/elles": "connaissent" } },
+            { inf: "sentir", de: "fühlen/riechen", aux: "avoir", pp: "senti", pres: { "je": "sens", "tu": "sens", "il/elle/on": "sent", "nous": "sentons", "vous": "sentez", "ils/elles": "sentent" } },
+            { inf: "venir", de: "kommen", aux: "être", pp: "venu", pres: { "je": "viens", "tu": "viens", "il/elle/on": "vient", "nous": "venons", "vous": "venez", "ils/elles": "viennent" } },
+            { inf: "devenir", de: "werden", aux: "être", pp: "devenu", pres: { "je": "deviens", "tu": "deviens", "il/elle/on": "devient", "nous": "devenons", "vous": "devenez", "ils/elles": "deviennent" } },
+            { inf: "partir", de: "weggehen", aux: "être", pp: "parti", pres: { "je": "pars", "tu": "pars", "il/elle/on": "part", "nous": "partons", "vous": "partez", "ils/elles": "partent" } },
+            { inf: "sortir", de: "ausgehen", aux: "être", pp: "sorti", pres: { "je": "sors", "tu": "sors", "il/elle/on": "sort", "nous": "sortons", "vous": "sortez", "ils/elles": "sortent" } },
+            { inf: "écrire", de: "schreiben", aux: "avoir", pp: "écrit", pres: { "je": "écris", "tu": "écris", "il/elle/on": "écrit", "nous": "écrivons", "vous": "écrivez", "ils/elles": "écrivent" } },
+            { inf: "lire", de: "lesen", aux: "avoir", pp: "lu", pres: { "je": "lis", "tu": "lis", "il/elle/on": "lit", "nous": "lisons", "vous": "lisez", "ils/elles": "lisent" } },
+            { inf: "suivre", de: "folgen", aux: "avoir", pp: "suivi", pres: { "je": "suis", "tu": "suis", "il/elle/on": "suit", "nous": "suivons", "vous": "suivez", "ils/elles": "suivent" } },
+            { inf: "finir", de: "beenden", aux: "avoir", pp: "fini", pres: { "je": "finis", "tu": "finis", "il/elle/on": "finit", "nous": "finissons", "vous": "finissez", "ils/elles": "finissent" } },
+            { inf: "essayer", de: "versuchen", aux: "avoir", pp: "essayé", pres: { "je": "essaie", "tu": "essaies", "il/elle/on": "essaie", "nous": "essayons", "vous": "essayez", "ils/elles": "essaient" } },
+            { inf: "acheter", de: "kaufen", aux: "avoir", pp: "acheté", pres: { "je": "achète", "tu": "achètes", "il/elle/on": "achète", "nous": "achetons", "vous": "achetez", "ils/elles": "achètent" } },
+            { inf: "appeler", de: "rufen", aux: "avoir", pp: "appelé", pres: { "je": "appelle", "tu": "appelles", "il/elle/on": "appelle", "nous": "appelons", "vous": "appelez", "ils/elles": "appellent" } }
+        ];
+
+        // --------- Persistence & Progress ----------
+        const STORAGE_KEY = "frenchAppProgress_v1";
+
+        class ProgressStore {
+            constructor() {
+                this.data = this.load();
+            }
+
+            load() {
+                try {
+                    const s = localStorage.getItem(STORAGE_KEY);
+                    return s ? JSON.parse(s) : this.defaultData();
+                } catch (e) {
+                    return this.defaultData();
+                }
+            }
+
+            defaultData() {
+                return {
+                    "de-fr-mc": [],
+                    "de-fr-write": [],
+                    "fr-de-mc": [],
+                    "fr-de-write": [],
+                    "pc": [],
+                    "conj-mc": [],
+                    "conj-write": []
+                };
+            }
+
+            save() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+                updateStartScreen();
+            }
+
+            markLearned(mode, id) {
+                if (!this.data[mode]) this.data[mode] = [];
+                if (!this.data[mode].includes(id)) {
+                    this.data[mode].push(id);
+                    this.save();
+                }
+            }
+
+            isLearned(mode, id) {
+                return this.data[mode] && this.data[mode].includes(id);
+            }
+
+            reset() {
+                this.data = this.defaultData();
+                this.save();
+            }
+
+            getStats(mode, totalItems) {
+                const learned = this.data[mode] ? this.data[mode].length : 0;
+                return { learned, total: totalItems, percent: Math.floor((learned / totalItems) * 100) };
+            }
+
+            // Calculate mastery for a specific verb across ALL modes
+            getVerbMastery(verbInf) {
+                let total = 0;
+                let learned = 0;
+
+                // Vocab modes (4 modes, 1 item each)
+                ["de-fr-mc", "de-fr-write", "fr-de-mc", "fr-de-write"].forEach(m => {
+                    total++;
+                    // ID for simple modes is just verb.inf
+                    if (this.isLearned(m, verbInf)) learned++;
+                });
+
+                // Conjugation & PC (3 modes, 6 items each)
+                const v = verbs.find(x => x.inf === verbInf);
+                if (v) {
+                    const persons = Object.keys(v.pres || {});
+                    const pcPersons = ["je", "tu", "il", "nous", "vous", "ils"];
+
+                    // Conj MC
+                    persons.forEach(p => {
+                        total++;
+                        if (this.isLearned("conj-mc", verbInf + ":" + p)) learned++;
+                    });
+                    // Conj Write
+                    persons.forEach(p => {
+                        total++;
+                        if (this.isLearned("conj-write", verbInf + ":" + p)) learned++;
+                    });
+                    // PC
+                    pcPersons.forEach(p => {
+                        total++;
+                        if (this.isLearned("pc", verbInf + ":" + p)) learned++;
+                    });
+                }
+
+                return { learned, total, percent: total === 0 ? 0 : Math.floor((learned / total) * 100) };
+            }
+        }
+
+        const store = new ProgressStore();
+
+        // --------- Item Generators ----------
+        function getAllItems(mode) {
+            const items = [];
+            if (mode.includes("conj") || mode === "pc") {
+                verbs.forEach(v => {
+                    const persons = Object.keys(v.pres || {});
+                    const pcPersons = ["je", "tu", "il", "nous", "vous", "ils"];
+                    const list = (mode === "pc") ? pcPersons : persons;
+
+                    list.forEach(p => {
+                        items.push({
+                            id: v.inf + ":" + p,
+                            verb: v,
+                            person: p,
+                            mode: mode
+                        });
+                    });
+                });
+            } else {
+                verbs.forEach(v => {
+                    items.push({
+                        id: v.inf,
+                        verb: v,
+                        mode: mode
+                    });
+                });
+            }
+            return items;
+        }
+
+        // --------- Session Logic ----------
+        const SESSION_SIZE = 10;
+
+        class Session {
+            constructor(mode) {
+                this.mode = mode;
+                this.allItems = getAllItems(mode);
+                this.queue = this.initQueue();
+                this.sessionScore = 0;
+                this.updateUI();
+            }
+
+            initQueue() {
+                const unlearned = this.allItems.filter(item => !store.isLearned(this.mode, item.id));
+                if (unlearned.length === 0) return [];
+                const shuffled = shuffle(unlearned);
+                return shuffled.slice(0, SESSION_SIZE);
+            }
+
+            next() {
+                if (this.queue.length === 0) return null;
+                this.current = this.queue[0];
+                return this.current;
+            }
+
+            markCorrect() {
+                store.markLearned(this.mode, this.current.id);
+                this.sessionScore++;
+                this.queue.shift();
+                this.updateUI();
+            }
+
+            markWrong() {
+                const v = this.queue.shift();
+                this.queue.push(v);
+                this.updateUI();
+            }
+
+            isFinished() {
+                return this.queue.length === 0;
+            }
+
+            updateUI() {
+                document.getElementById("session-val").textContent = this.sessionScore;
+                document.getElementById("remaining-val").textContent = this.queue.length;
+            }
+        }
+
+        let currentSession = null;
+
+        // --------- UI Updates ----------
+        function updateStartScreen() {
+            const modes = ["de-fr-mc", "de-fr-write", "fr-de-mc", "fr-de-write", "pc", "conj-mc", "conj-write"];
+            let totalLearned = 0;
+            let totalItems = 0;
+
+            modes.forEach(m => {
+                const all = getAllItems(m);
+                const stats = store.getStats(m, all.length);
+
+                totalLearned += stats.learned;
+                totalItems += stats.total;
+
+                const btn = document.querySelector(`button[data-target="${m}"]`);
+                if (btn) {
+                    btn.querySelector(".prog-txt").textContent = stats.percent + "%";
+                    btn.querySelector(".btn-progress").style.width = stats.percent + "%";
+                    if (stats.percent === 100) {
+                        btn.style.borderColor = "#fbbf24";
+                        btn.querySelector(".prog-txt").style.color = "#fbbf24";
+                    }
+                }
+            });
+
+            const globalPercent = totalItems === 0 ? 0 : Math.floor((totalLearned / totalItems) * 100);
+            document.getElementById("global-percent").textContent = globalPercent + "%";
+            document.getElementById("global-fill").style.width = globalPercent + "%";
+        }
+
+        function updateStatsScreen() {
+            const list = document.getElementById("stats-list");
+            list.innerHTML = "";
+
+            verbs.forEach(v => {
+                const stats = store.getVerbMastery(v.inf);
+                const el = document.createElement("div");
+                el.className = "stat-item";
+
+                let color = "#ef4444"; // red
+                if (stats.percent > 30) color = "#facc15"; // yellow
+                if (stats.percent > 70) color = "#22c55e"; // green
+                if (stats.percent === 100) color = "#fbbf24"; // gold
+
+                el.innerHTML = `
+          <div class="stat-info">
+            <div class="stat-name">${v.inf}</div>
+            <div class="stat-sub">${v.de}</div>
+          </div>
+          <div class="stat-val" style="color:${color}">${stats.percent}%</div>
+          <div class="stat-bar-bg">
+            <div class="stat-bar-fill" style="width:${stats.percent}%; background:${color}"></div>
+          </div>
+        `;
+                list.appendChild(el);
+            });
+        }
+
+        function resetAllProgress() {
+            if (confirm("Wirklich den gesamten Fortschritt löschen?")) {
+                store.reset();
+                updateStartScreen();
+            }
+        }
+
+        // --------- Helpers ----------
+        const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+        function shuffle(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // STRICT VALIDATION: Case-insensitive but Accent-sensitive
+        function checkAnswer(input, correct) {
+            // .toLowerCase() preserves accents (e.g. "ÉTÉ" -> "été")
+            // So "Ete" -> "ete" != "été" (Correctly fails)
+            // "ÉTÉ" -> "été" == "été" (Correctly passes)
+            return input.trim().toLowerCase() === correct.trim().toLowerCase();
+        }
+
+        function showFeedback(el, isCorrect, correctText) {
+            el.classList.remove("ok", "err");
+            el.classList.add("visible");
+            if (isCorrect) {
+                el.textContent = "Richtig! Gelernt.";
+                el.classList.add("ok");
+            } else {
+                el.innerHTML = "Leider falsch.<br>Richtige Antwort: <strong>" + correctText + "</strong>";
+                el.classList.add("err");
+            }
+        }
+        function resetFeedback(el) {
+            el.textContent = "";
+            el.classList.remove("visible", "ok", "err");
+        }
+
+        // --------- Navigation ----------
+        const screens = {
+            start: document.getElementById("screen-start"),
+            stats: document.getElementById("screen-stats"),
+            victory: document.getElementById("screen-victory"),
+            "de-fr-mc": document.getElementById("screen-de-fr-mc"),
+            "de-fr-write": document.getElementById("screen-de-fr-write"),
+            "fr-de-mc": document.getElementById("screen-fr-de-mc"),
+            "fr-de-write": document.getElementById("screen-fr-de-write"),
+            pc: document.getElementById("screen-pc"),
+            "conj-mc": document.getElementById("screen-conj-mc"),
+            "conj-write": document.getElementById("screen-conj-write")
+        };
+
+        function showScreen(id) {
+            Object.values(screens).forEach(s => s.classList.remove("active"));
+            screens[id].classList.add("active");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            if (id === "start") {
+                updateStartScreen();
+                return;
+            }
+            if (id === "stats") {
+                updateStatsScreen();
+                return;
+            }
+            if (id === "victory") return;
+
+            currentSession = new Session(id);
+
+            if (currentSession.queue.length === 0) {
+                document.getElementById("vic-title").textContent = "Perfekt!";
+                document.getElementById("vic-msg").textContent = "Du hast diesen Modus zu 100% gemeistert! Alle Verben gelernt.";
+                showScreen("victory");
+                return;
+            }
+
+            if (id === "de-fr-mc") newDfMc();
+            if (id === "de-fr-write") newDfWrite();
+            if (id === "fr-de-mc") newFdMc();
+            if (id === "fr-de-write") newFdWrite();
+            if (id === "pc") newPc();
+            if (id === "conj-mc") newConjMc();
+            if (id === "conj-write") newConjWrite();
+        }
+
+        document.querySelectorAll("[data-target]").forEach(btn => {
+            btn.addEventListener("click", () => showScreen(btn.dataset.target));
+        });
+        document.querySelectorAll("[data-back]").forEach(el => {
+            el.addEventListener("click", () => showScreen("start"));
+        });
+
+        function checkVictory() {
+            if (currentSession.isFinished()) {
+                document.getElementById("vic-title").textContent = "Gut gemacht!";
+                document.getElementById("vic-msg").textContent = "Session beendet. Fortschritt gespeichert.";
+                showScreen("victory");
+                return true;
+            }
+            return false;
+        }
+
+        // --------- DE → FR MC ----------
+        function newDfMc() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+
+            const q = document.getElementById("dfmc-q");
+            const optBox = document.getElementById("dfmc-opt");
+            const fb = document.getElementById("dfmc-fb");
+            const nextBtn = document.getElementById("dfmc-next");
+
+            resetFeedback(fb);
+            nextBtn.style.display = "none";
+            q.innerHTML = 'Was heißt auf Französisch:<br><strong>' + verb.de + "</strong>";
+
+            let opts = [verb.inf];
+            while (opts.length < 4) {
+                const o = rand(verbs).inf;
+                if (!opts.includes(o)) opts.push(o);
+            }
+            opts = shuffle(opts);
+            optBox.innerHTML = "";
+
+            opts.forEach(o => {
+                const b = document.createElement("button");
+                b.textContent = o;
+                b.className = "option-btn";
+                b.addEventListener("click", () => {
+                    if (b.disabled) return;
+                    const isCorrect = (o === verb.inf);
+                    if (isCorrect) {
+                        b.classList.add("correct");
+                        currentSession.markCorrect();
+                        showFeedback(fb, isCorrect, verb.inf);
+                        setTimeout(newDfMc, 800);
+                    } else {
+                        b.classList.add("wrong");
+                        currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+                        Array.from(optBox.children).forEach(child => {
+                            if (child.textContent === verb.inf) child.classList.add("correct");
+                        });
+                        showFeedback(fb, isCorrect, verb.inf);
+                        nextBtn.style.display = "block";
+                    }
+                    Array.from(optBox.children).forEach(btn => (btn.disabled = true));
+                });
+                optBox.appendChild(b);
+            });
+        }
+        document.getElementById("dfmc-next").addEventListener("click", newDfMc);
+
+        // --------- DE → FR Schreiben ----------
+        function newDfWrite() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+
+            document.getElementById("dfw-q").innerHTML = 'Übersetze ins Französische:<br><strong>' + verb.de + "</strong>";
+            const inp = document.getElementById("dfw-in");
+            inp.value = "";
+            resetFeedback(document.getElementById("dfw-fb"));
+            document.getElementById("dfw-check").textContent = "Prüfen";
+            inp.focus();
+        }
+
+        document.getElementById("dfw-check").addEventListener("click", function () {
+            const btn = this;
+            if (btn.textContent === "Weiter") {
+                newDfWrite();
+                return;
+            }
+            const item = currentSession.current;
+            const inp = document.getElementById("dfw-in").value;
+            const fb = document.getElementById("dfw-fb");
+            const isCorrect = checkAnswer(inp, item.verb.inf);
+
+            if (isCorrect) currentSession.markCorrect();
+            else currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+
+            showFeedback(fb, isCorrect, item.verb.inf);
+            btn.textContent = "Weiter";
+        });
+
+        // --------- FR → DE MC ----------
+        function newFdMc() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+
+            const q = document.getElementById("fdmc-q");
+            const optBox = document.getElementById("fdmc-opt");
+            const fb = document.getElementById("fdmc-fb");
+            const nextBtn = document.getElementById("fdmc-next");
+
+            resetFeedback(fb);
+            nextBtn.style.display = "none";
+            q.innerHTML = 'Was heißt auf Deutsch:<br><strong>' + verb.inf + "</strong>";
+
+            let opts = [verb.de];
+            while (opts.length < 4) {
+                const o = rand(verbs).de;
+                if (!opts.includes(o)) opts.push(o);
+            }
+            opts = shuffle(opts);
+            optBox.innerHTML = "";
+
+            opts.forEach(o => {
+                const b = document.createElement("button");
+                b.textContent = o;
+                b.className = "option-btn";
+                b.addEventListener("click", () => {
+                    if (b.disabled) return;
+                    const isCorrect = (o === verb.de);
+                    if (isCorrect) {
+                        b.classList.add("correct");
+                        currentSession.markCorrect();
+                        showFeedback(fb, isCorrect, verb.de);
+                        setTimeout(newFdMc, 800);
+                    } else {
+                        b.classList.add("wrong");
+                        currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+                        Array.from(optBox.children).forEach(child => {
+                            if (child.textContent === verb.de) child.classList.add("correct");
+                        });
+                        showFeedback(fb, isCorrect, verb.de);
+                        nextBtn.style.display = "block";
+                    }
+                    Array.from(optBox.children).forEach(btn => (btn.disabled = true));
+                });
+                optBox.appendChild(b);
+            });
+        }
+        document.getElementById("fdmc-next").addEventListener("click", newFdMc);
+
+        // --------- FR → DE Schreiben ----------
+        function newFdWrite() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+
+            document.getElementById("fdw-q").innerHTML = 'Übersetze ins Deutsche:<br><strong>' + verb.inf + "</strong>";
+            const inp = document.getElementById("fdw-in");
+            inp.value = "";
+            resetFeedback(document.getElementById("fdw-fb"));
+            document.getElementById("fdw-check").textContent = "Prüfen";
+            inp.focus();
+        }
+
+        document.getElementById("fdw-check").addEventListener("click", function () {
+            const btn = this;
+            if (btn.textContent === "Weiter") {
+                newFdWrite();
+                return;
+            }
+            const item = currentSession.current;
+            const inp = document.getElementById("fdw-in").value;
+            const fb = document.getElementById("fdw-fb");
+            const isCorrect = checkAnswer(inp, item.verb.de);
+
+            if (isCorrect) currentSession.markCorrect();
+            else currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+
+            showFeedback(fb, isCorrect, item.verb.de);
+            btn.textContent = "Weiter";
+        });
+
+        // --------- Passé composé ----------
+        const pcPersonForms = {
+            "je": { avoir: "ai", "être": "suis" },
+            "tu": { avoir: "as", "être": "es" },
+            "il": { avoir: "a", "être": "est" },
+            "nous": { avoir: "avons", "être": "sommes" },
+            "vous": { avoir: "avez", "être": "êtes" },
+            "ils": { avoir: "ont", "être": "sont" }
+        };
+
+        function newPc() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+            const person = item.person;
+
+            const q = document.getElementById("pc-q");
+            const inp = document.getElementById("pc-in");
+            resetFeedback(document.getElementById("pc-fb"));
+            inp.value = "";
+            document.getElementById("pc-check").textContent = "Prüfen";
+
+            q.innerHTML = "Bilde das Passé composé:<br><strong>" + person + " " + verb.inf + "</strong>";
+            inp.focus();
+        }
+
+        document.getElementById("pc-check").addEventListener("click", function () {
+            const btn = this;
+            if (btn.textContent === "Weiter") {
+                newPc();
+                return;
+            }
+            const item = currentSession.current;
+            const verb = item.verb;
+            const person = item.person;
+
+            const inp = document.getElementById("pc-in").value;
+            const fb = document.getElementById("pc-fb");
+            const aux = verb.aux;
+            const auxForm = pcPersonForms[person][aux];
+
+            let fullCorrect = "";
+            if (person === "je" && aux === "avoir") {
+                fullCorrect = "j'ai " + verb.pp;
+            } else if (person === "je" && aux === "être") {
+                fullCorrect = "je suis " + verb.pp;
+            } else {
+                fullCorrect = person + " " + auxForm + " " + verb.pp;
+            }
+
+            const isCorrect = checkAnswerEnhanced(inp, fullCorrect);
+            if (isCorrect) currentSession.markCorrect();
+            else currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+
+            showFeedback(fb, isCorrect, fullCorrect);
+            btn.textContent = "Weiter";
+        });
+
+        // --------- Konjugation MC ----------
+        function newConjMc() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+            const person = item.person;
+
+            const q = document.getElementById("conj-mc-q");
+            const optBox = document.getElementById("conj-mc-opt");
+            const fb = document.getElementById("conj-mc-fb");
+            const nextBtn = document.getElementById("conj-mc-next");
+
+            resetFeedback(fb);
+            nextBtn.style.display = "none";
+            q.innerHTML = "Präsens von:<br><strong>" + person + " " + verb.inf + "</strong>";
+
+            const correct = verb.pres[person];
+            let opts = [correct];
+            while (opts.length < 4) {
+                const r = rand(verbs);
+                const forms = Object.values(r.pres);
+                const form = rand(forms);
+                if (form && !opts.includes(form)) opts.push(form);
+            }
+            opts = shuffle(opts);
+            optBox.innerHTML = "";
+
+            opts.forEach(o => {
+                const b = document.createElement("button");
+                b.textContent = o;
+                b.className = "option-btn";
+                b.addEventListener("click", () => {
+                    if (b.disabled) return;
+                    const isCorrect = (o === correct);
+                    if (isCorrect) {
+                        b.classList.add("correct");
+                        currentSession.markCorrect();
+                        showFeedback(fb, isCorrect, correct);
+                        setTimeout(newConjMc, 800);
+                    } else {
+                        b.classList.add("wrong");
+                        currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+                        Array.from(optBox.children).forEach(child => {
+                            if (child.textContent === correct) child.classList.add("correct");
+                        });
+                        showFeedback(fb, isCorrect, correct);
+                        nextBtn.style.display = "block";
+                    }
+                    Array.from(optBox.children).forEach(btn => (btn.disabled = true));
+                });
+                optBox.appendChild(b);
+            });
+        }
+        document.getElementById("conj-mc-next").addEventListener("click", newConjMc);
+
+        // --------- Konjugation Schreiben ----------
+        function newConjWrite() {
+            if (checkVictory()) return;
+            const item = currentSession.next();
+            const verb = item.verb;
+            const person = item.person;
+
+            const q = document.getElementById("conj-w-q");
+            const inp = document.getElementById("conj-w-in");
+            resetFeedback(document.getElementById("conj-w-fb"));
+            inp.value = "";
+            document.getElementById("conj-w-check").textContent = "Prüfen";
+
+            q.innerHTML = "Präsens (nur Verb) für:<br><strong>" + person + " " + verb.inf + "</strong>";
+            inp.focus();
+        }
+
+        document.getElementById("conj-w-check").addEventListener("click", function () {
+            const btn = this;
+            if (btn.textContent === "Weiter") {
+                newConjWrite();
+                return;
+            }
+            const item = currentSession.current;
+            const correct = item.verb.pres[item.person];
+            const inp = document.getElementById("conj-w-in").value;
+            const fb = document.getElementById("conj-w-fb");
+
+            const isCorrect = checkAnswer(inp, correct);
+            if (isCorrect) currentSession.markCorrect();
+            else currentSession.markWrong();
+                        if (item && item.verb) trackDifficultVerb(item.verb.inf);
+
+            showFeedback(fb, isCorrect, correct);
+            btn.textContent = "Weiter";
+        });
+
+        // Init
+        updateStartScreen();
+    </script>
+</body>
+
+</html>

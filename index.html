@@ -1534,6 +1534,16 @@
 
         // Init
         updateStartScreen();
+
+        // Setup Enter key for all writing modes
+        setupEnterKey('dfw-in', 'dfw-check');     // DE → FR Schreiben
+        setupEnterKey('fdw-in', 'fdw-check');     // FR → DE Schreiben
+        setupEnterKey('pc-in', 'pc-check');       // Passé composé
+        setupEnterKey('conj-w-in', 'conj-w-check'); // Konjugation Schreiben
+
+        loadTheme();
+        updateStreakCounter();
+        setupKeyboardNav();
     </script>
 </body>
 
